@@ -9,7 +9,7 @@ schema: |-
       relation manager @user 
       
       action create_repository = admin or member or manager
-      action delete = admin
+      action delete = admin or manager
   }
   entity repository {
 
