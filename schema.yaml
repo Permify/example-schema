@@ -1,0 +1,74 @@
+tenant_id: t1
+
+schema: |-
+  entity user {}
+  entity organization {
+
+      relation admin @user
+      relation member @user
+
+      action create_repository = admin or member
+      action delete = admin
+  }
+  entity repository {
+
+      relation owner @user @organization#member
+      relation parent @organization
+
+      action push = owner
+      action read = (owner and (parent.admin and parent.member))
+      action delete = (parent.member and (parent.admin or owner))
+      action edit = parent.member not owner
+  }
+relationships:
+  - 'organization:1#admin@user:1'
+  - 'organization:1#member@user:1'
+  - 'repository:1#owner@user:1'
+scenarios:
+  - name: scenario 1
+    description: test description
+    checks:
+      - entity: 'repository:1'
+        subject: 'user:1'
+        assertions:
+          push: true
+          owner: true
+      - entity: 'repository:2'
+        subject: 'user:1'
+        assertions:
+          push: false
+      - entity: 'repository:3'
+        subject: 'user:1'
+        context:
+          tuples:
+            - 'repository:3#owner@user:1'
+        assertions:
+          push: true
+      - entity: 'repository:1'
+        subject: 'user:43'
+        assertions:
+          edit: false
+    entity_filters:
+      - entity_type: repository
+        subject: 'user:1'
+        context:
+          tuples:
+            - 'repository:3#owner@user:1'
+            - 'repository:4#owner@user:1'
+            - 'repository:5#owner@user:1'
+        assertions:
+          push:
+            - '1'
+            - '3'
+            - '4'
+            - '5'
+          edit: []
+    subject_filters:
+      - subject_reference: user
+        entity: 'repository:1'
+        context:
+          tuples:
+            - 'organization:1#member@user:58'
+        assertions:
+          push:
+            - '1'
