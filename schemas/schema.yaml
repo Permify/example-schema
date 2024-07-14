@@ -4,10 +4,11 @@ schema: |-
   entity user {}
   entity organization {
 
-      relation admin @user
+      relation admin @user 
       relation member @user
-
-      action create_repository = admin or member
+      relation manager @user 
+      
+      action create_repository = admin or member or manager
       action delete = admin
   }
   entity repository {
