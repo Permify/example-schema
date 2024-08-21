@@ -5,6 +5,7 @@ schema: |-
   entity organization {
 
       relation admin @user 
+      relation editor @user
       relation member @user
       relation manager @user 
       
