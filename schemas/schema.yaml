@@ -8,7 +8,6 @@ schema: |-
       relation editor @user
       relation member @user
       relation manager @user
-      relation viewer @user
       
       action create_repository = admin or member or manager
       action delete = admin or manager
